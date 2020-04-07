@@ -1,4 +1,4 @@
-package com.example.topreddit;
+package com.example.topreddit.ui.fragments;
 
 
 import android.os.Bundle;
@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.topreddit.R;
 
 
 public class SaveImageFragment extends Fragment {

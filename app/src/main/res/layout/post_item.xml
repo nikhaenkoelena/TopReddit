@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imageViewImage"
+            android:layout_width="@dimen/image_width_on_card"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/image_margin_start_on_card"
+            android:layout_marginTop="@dimen/image_margin_top_on_card"
+            android:layout_marginBottom="@dimen/image_margin_bottom_on_card"
+            android:adjustViewBounds="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/redditicon" />
+
+        <TextView
+            android:id="@+id/textViewAuthor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/author_margin_start_on_card"
+            android:layout_marginTop="@dimen/author_margin_top_on_card"
+            android:textColor="@color/colorDarkBlue"
+            android:textSize="@dimen/author_text_size_on_card"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@+id/imageViewImage"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textViewTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/time_margin_start_on_card"
+            android:theme="@style/TimeCommentsStyle"
+            app:layout_constraintStart_toEndOf="@+id/imageViewImage"
+            app:layout_constraintTop_toBottomOf="@+id/textViewAuthor" />
+
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/title_margin_start_on_card"
+            android:layout_marginTop="@dimen/title_margin_top_on_card"
+            android:layout_marginEnd="@dimen/title_margin_end_on_card"
+            android:ellipsize="end"
+            android:lines="2"
+            android:maxLines="2"
+            android:textSize="@dimen/title_text_size_on_card"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageViewImage"
+            app:layout_constraintTop_toBottomOf="@+id/textViewTime" />
+
+
+        <TextView
+            android:id="@+id/textViewNumberOfComments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/comments_number_margin_start_on_card"
+            android:layout_marginTop="@dimen/comments_number_margin_top_on_card"
+            android:layout_marginBottom="@dimen/comments_number_margin_bottom_on_card"
+            android:gravity="bottom"
+            android:text="@string/comments_number_on_card"
+            android:theme="@style/TimeCommentsStyle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imageViewImage"
+            app:layout_constraintTop_toBottomOf="@+id/textViewTitle" />
+
+        <TextView
+            android:id="@+id/textViewLabelComments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/comments_margin_start_on_card"
+            android:layout_marginTop="@dimen/comments_margin_top_on_card"
+            android:layout_marginBottom="@dimen/comments_margin_bottom_on_card"
+            android:gravity="bottom"
+            android:text="@string/comments_label_on_card"
+            android:theme="@style/TimeCommentsStyle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textViewNumberOfComments"
+            app:layout_constraintTop_toBottomOf="@+id/textViewTitle" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="progressbar_main_fragment_width">60dp</dimen>
+    <dimen name="progressbar_main_fragment_height">60dp</dimen>
+    <dimen name="image_width_on_card">100dp</dimen>
+    <dimen name="image_margin_start_on_card">10dp</dimen>
+    <dimen name="image_margin_top_on_card">10dp</dimen>
+    <dimen name="image_margin_bottom_on_card">10dp</dimen>
+    <dimen name="author_margin_start_on_card">8dp</dimen>
+    <dimen name="author_margin_top_on_card">10dp</dimen>
+    <dimen name="author_text_size_on_card">14sp</dimen>
+    <dimen name="time_margin_start_on_card">8dp</dimen>
+    <dimen name="title_margin_start_on_card">8dp</dimen>
+    <dimen name="title_margin_top_on_card">4dp</dimen>
+    <dimen name="title_margin_end_on_card">10dp</dimen>
+    <dimen name="title_text_size_on_card">14sp</dimen>
+    <dimen name="comments_number_margin_start_on_card">8dp</dimen>
+    <dimen name="comments_number_margin_top_on_card">4dp</dimen>
+    <dimen name="comments_number_margin_bottom_on_card">10dp</dimen>
+    <dimen name="comments_margin_start_on_card">3dp</dimen>
+    <dimen name="comments_margin_top_on_card">4dp</dimen>
+    <dimen name="comments_margin_bottom_on_card">10dp</dimen>
+</resources>

@@ -14,9 +14,10 @@
             android:id="@+id/action_mainFragment_to_saveImageFragment"
             app:destination="@id/saveImageFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/saveImageFragment"
-        android:name="com.example.topreddit.SaveImageFragment"
+        android:name="com.example.topreddit.ui.fragments.SaveImageFragment"
         android:label="fragment_save_image"
         tools:layout="@layout/fragment_save_image" />
 </navigation>
