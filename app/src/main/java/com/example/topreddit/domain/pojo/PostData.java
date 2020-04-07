@@ -1,13 +1,16 @@
 package com.example.topreddit.domain.pojo;
 
+import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity(tableName = "posts_table")
 public class PostData {
 
+    @PrimaryKey(autoGenerate = true)
     @SerializedName("uniqId")
     @Expose
     private int uniqId;

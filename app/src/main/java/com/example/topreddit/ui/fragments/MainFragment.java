@@ -5,6 +5,9 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -19,6 +22,7 @@ import android.widget.ProgressBar;
 import com.example.topreddit.R;
 import com.example.topreddit.domain.pojo.PostData;
 import com.example.topreddit.ui.adapters.PostAdapter;
+import com.example.topreddit.viewmodels.MainViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +42,8 @@ public class MainFragment extends Fragment {
     private Unbinder unbinder;
     private PostAdapter adapter;
     private NavController navController;
+    private MainViewModel viewModel;
+    private LiveData<List<PostData>> posts;
 
 
     @Override
@@ -52,13 +58,25 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
+        viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         adapter = new PostAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
-        List<PostData> test = new ArrayList<>();
-        test.add(new PostData("gjndfjgv", "gjfdkjg", null, 5, 123, "jgkf", "jghg", 56, "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.astromeridian.ru%2Fsonnik%2F4132.html&psig=AOvVaw3FRmHdkgOsjRcXcvXMvG5B&ust=1586353942200000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCOianIy71ugCFQAAAAAdAAAAABAD", 5555L, "gjkdgnf"));
-        test.add(new PostData("gjndfjgv", "gjfdkjg", null, 5, 123, "jgkf", "jghg", 56, "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.astromeridian.ru%2Fsonnik%2F4132.html&psig=AOvVaw3FRmHdkgOsjRcXcvXMvG5B&ust=1586353942200000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCOianIy71ugCFQAAAAAdAAAAABAD", 5555L, "gjkdgnf"));
-        adapter.setPostDatas(test);
+        getPosts();
+        viewModel.loadData();
+    }
+
+    private void getPosts() {
+        posts = viewModel.getAllPosts();
+        posts.observe(this, new Observer<List<PostData>>() {
+            @Override
+            public void onChanged(List<PostData> postData) {
+                if (postData != null) {
+                    adapter.setPostDatas(postData);
+                }
+            }
+        });
+
     }
 
     @Override
