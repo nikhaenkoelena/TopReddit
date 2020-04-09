@@ -7,4 +7,5 @@
     <string name="comments_label_on_card">Comments</string>
     <string name="no_image_notification">There is no image on this post</string>
     <string name="save_to_gallery">Save to gallery</string>
+    <string name="error_showing_data">Error showing data</string>
 </resources>

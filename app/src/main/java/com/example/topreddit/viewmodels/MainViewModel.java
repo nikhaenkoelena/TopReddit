@@ -22,8 +22,8 @@ public class MainViewModel extends AndroidViewModel {
         repository = new Repository(application);
     }
 
-    public void loadData() {
-        repository.loadData();
+    public void loadData(String after) {
+        repository.loadData(after);
     }
 
     public LiveData<List<PostData>> getAllPosts() {

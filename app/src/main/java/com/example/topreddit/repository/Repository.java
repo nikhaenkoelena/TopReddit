@@ -41,6 +41,8 @@ public class Repository {
     private PostDatabase database;
     private LiveData<List<PostData>> posts;
 
+    private static final String NULL_CHECK = "null";
+
     public Repository(Context context) {
         this.context = context;
         compositeDisposable = new CompositeDisposable();
@@ -48,8 +50,9 @@ public class Repository {
         posts = database.postDao().getAllPosts();
     }
 
-    public void loadData() {
-        final String afterDef = null;
+    public void loadData(String after) {
+        final String afterDef = after;
+        Log.i("CheckAfter", after.toString());
         ApiFactory apiFactory = ApiFactory.getInstance();
         ApiService apiService = apiFactory.getApiService();
         Disposable disposable = apiService.getPosts(afterDef)
@@ -60,6 +63,9 @@ public class Repository {
                     public void accept(PostResult postResult) throws Exception {
                         List<PostData> postDataFromJSON = new ArrayList<>();
                         Data data = postResult.getData();
+                        if (afterDef.equals(NULL_CHECK)) {
+                            deleteAllPosts();
+                        }
                         List<Child> childList = data.getChildren();
                         for (Child child : childList) {
                             PostData postData = child.getPostData();
@@ -67,9 +73,11 @@ public class Repository {
                             postData.setAfterDef(data.getAfter());
                             postDataFromJSON.add(postData);
                         }
-                        deleteAllPosts();
+                        updateAfter(data.getAfter());
                         insertAllPosts(postDataFromJSON);
-                        Log.i("Проверка1", Integer.toString(postDataFromJSON.size()));
+                        Log.i("CheckInsert", "one");
+
+
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -143,6 +151,19 @@ public class Repository {
 //                Log.i("ExternalStorage", "-> uri=" + uri);
 //            }
 //        });
+    }
+
+    private void updateAfter(final String afterDef) {
+        Completable.fromAction(new Action() {
+            @Override
+            public void run() throws Exception {
+                if (afterDef != null && !afterDef.isEmpty()) {
+                    database.postDao().updateAfter(afterDef);
+                }
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 
     public void dispose() {

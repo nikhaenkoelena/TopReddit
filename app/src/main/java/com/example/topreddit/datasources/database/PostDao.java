@@ -28,4 +28,7 @@ public abstract class PostDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertPosts(List<PostData> posts);
 
+    @Query("UPDATE posts_table SET afterDef =:afterDefin;")
+    public abstract void updateAfter(String afterDefin);
+
 }

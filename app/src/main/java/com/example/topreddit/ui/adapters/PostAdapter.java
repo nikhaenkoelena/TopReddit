@@ -25,6 +25,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     private List<PostData> postDatas;
     private OnImageClickListener onImageClickListener;
     private OnPostClickListener onPostClickListener;
+    private OnReachEndListener onReachEndListener;
+
+    private static final int DATA_SIZE = 25;
+    private static final int DATA_SIZE_TO_START_LOAD = 6;
     private static final String HTTP_FORMAT = "http";
 
     public PostAdapter() {
@@ -56,6 +60,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         this.onPostClickListener = onPostClickListener;
     }
 
+    public interface OnReachEndListener {
+        void onReachEnd();
+    }
+
+    public void setOnReachEndListener(OnReachEndListener onReachEndListener) {
+        this.onReachEndListener = onReachEndListener;
+    }
+
     @NonNull
     @Override
     public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -65,6 +77,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
+        if (postDatas.size() >= DATA_SIZE && position > postDatas.size() - DATA_SIZE_TO_START_LOAD && onReachEndListener != null) {
+            onReachEndListener.onReachEnd();
+        }
         PostData postData = postDatas.get(position);
         String thumnailImage = postData.getThumbnailImage();
         if (thumnailImage != null && thumnailImage.contains(HTTP_FORMAT)) {
@@ -110,7 +125,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (onPostClickListener!= null) {
+                    if (onPostClickListener != null) {
                         onPostClickListener.onPostClick(getAdapterPosition());
                     }
                 }

@@ -45,9 +45,13 @@ public class MainFragment extends Fragment {
     private MainViewModel viewModel;
     private LiveData<List<PostData>> posts;
 
+    private String after = "null";
+    private static final int ELEMENT_INDEX_LIVEDATA = 1;
     private static final String JPEG_FORMAT = ".jpg";
     private static final String PNG_FORMAT = ".png";
     private static final String BUNDLE_KEY = "Url";
+
+    private static boolean isLoading;
 
 
     @Override
@@ -55,6 +59,7 @@ public class MainFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         unbinder = ButterKnife.bind(this, view);
+        setRetainInstance(true);
         return view;
     }
 
@@ -66,10 +71,12 @@ public class MainFragment extends Fragment {
         adapter = new PostAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+        isLoading = false;
         setOnImageClickListener();
         setOnPostClickListener();
+        setOnReachEndListener();
         getPosts();
-        viewModel.loadData();
+        viewModel.loadData(after);
     }
 
     private void getPosts() {
@@ -79,6 +86,13 @@ public class MainFragment extends Fragment {
             public void onChanged(List<PostData> postData) {
                 if (postData != null) {
                     adapter.setPostDatas(postData);
+                    progressBar.setVisibility(View.GONE);
+                    isLoading = false;
+                    if (postData.size() > 0) {
+                        after = postData.get(ELEMENT_INDEX_LIVEDATA).getAfterDef();
+                    }
+                } else {
+                    Toast.makeText(getContext(), R.string.error_showing_data, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -110,6 +124,17 @@ public class MainFragment extends Fragment {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(postData.getUrl()));
                 startActivity(intent);
 
+            }
+        });
+    }
+
+    private void setOnReachEndListener() {
+        adapter.setOnReachEndListener(new PostAdapter.OnReachEndListener() {
+            @Override
+            public void onReachEnd() {
+                viewModel.loadData(after);
+                progressBar.setVisibility(View.VISIBLE);
+                isLoading = true;
             }
         });
     }
