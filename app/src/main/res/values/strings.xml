@@ -5,4 +5,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="comments_number_on_card">0</string>
     <string name="comments_label_on_card">Comments</string>
+    <string name="no_image_notification">There is no image on this post</string>
+    <string name="save_to_gallery">Save to gallery</string>
 </resources>

@@ -20,4 +20,6 @@
     <dimen name="comments_margin_start_on_card">3dp</dimen>
     <dimen name="comments_margin_top_on_card">4dp</dimen>
     <dimen name="comments_margin_bottom_on_card">10dp</dimen>
+    <dimen name="image_fragment_image_margin">8dp</dimen>
+    <dimen name="button_image_fragment_margin_top">8dp</dimen>
 </resources>

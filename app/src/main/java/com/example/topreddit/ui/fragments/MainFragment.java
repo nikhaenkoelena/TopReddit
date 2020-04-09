@@ -1,5 +1,7 @@
 package com.example.topreddit.ui.fragments;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,7 +12,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,15 +19,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.topreddit.R;
 import com.example.topreddit.domain.pojo.PostData;
 import com.example.topreddit.ui.adapters.PostAdapter;
 import com.example.topreddit.viewmodels.MainViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,6 +45,10 @@ public class MainFragment extends Fragment {
     private MainViewModel viewModel;
     private LiveData<List<PostData>> posts;
 
+    private static final String JPEG_FORMAT = ".jpg";
+    private static final String PNG_FORMAT = ".png";
+    private static final String BUNDLE_KEY = "Url";
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,6 +66,8 @@ public class MainFragment extends Fragment {
         adapter = new PostAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+        setOnImageClickListener();
+        setOnPostClickListener();
         getPosts();
         viewModel.loadData();
     }
@@ -77,6 +83,35 @@ public class MainFragment extends Fragment {
             }
         });
 
+    }
+
+    private void setOnImageClickListener() {
+        adapter.setOnImageClickListener(new PostAdapter.OnImageClickListener() {
+            @Override
+            public void onImageClick(int position) {
+                PostData postData = adapter.getPostDatas().get(position);
+                String url = postData.getUrl();
+                if (url.contains(JPEG_FORMAT) || url.contains(PNG_FORMAT)) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(BUNDLE_KEY, postData.getUrl());
+                    navController.navigate(R.id.action_mainFragment_to_saveImageFragment, bundle);
+                } else {
+                    Toast.makeText(getContext(), R.string.no_image_notification, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void setOnPostClickListener() {
+        adapter.setOnPostClickListener(new PostAdapter.OnPostClickListener() {
+            @Override
+            public void onPostClick(int position) {
+                PostData postData = adapter.getPostDatas().get(position);
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(postData.getUrl()));
+                startActivity(intent);
+
+            }
+        });
     }
 
     @Override

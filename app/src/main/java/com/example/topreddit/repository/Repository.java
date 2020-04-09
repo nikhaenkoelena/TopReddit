@@ -1,6 +1,11 @@
 package com.example.topreddit.repository;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -14,6 +19,10 @@ import com.example.topreddit.domain.pojo.Data;
 import com.example.topreddit.domain.pojo.PostData;
 import com.example.topreddit.domain.pojo.PostResult;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +69,7 @@ public class Repository {
                         }
                         deleteAllPosts();
                         insertAllPosts(postDataFromJSON);
+                        Log.i("Проверка1", Integer.toString(postDataFromJSON.size()));
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -92,11 +102,47 @@ public class Repository {
         Completable.fromAction(new Action() {
             @Override
             public void run() throws Exception {
-                database.postDao().deleteAllPosts();
+                database.postDao().deleteAllPostTransaction();
             }
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
+    }
+
+    public void onSaveImageClick(String url, Context context) {
+        Uri uri = Uri.parse(url);
+        Bitmap bitmap = null;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
+        } catch (
+                IOException e) {
+            e.printStackTrace();
+        }
+        FileOutputStream outStream = null;
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + "reddit");
+        path.mkdirs();
+        File imageFile = new File(path, System.currentTimeMillis() + ".png");
+        try {
+            outStream = new FileOutputStream(imageFile);
+        } catch (
+                FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            assert bitmap != null;
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+            assert outStream != null;
+            outStream.flush();
+            outStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        MediaScannerConnection.scanFile(context, new String[]{imageFile.getAbsolutePath()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+//            public void onScanCompleted(String path, Uri uri) {
+//                Log.i("ExternalStorage", "Scanned " + path + ":");
+//                Log.i("ExternalStorage", "-> uri=" + uri);
+//            }
+//        });
     }
 
     public void dispose() {

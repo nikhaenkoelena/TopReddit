@@ -5,6 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 
 import com.example.topreddit.domain.pojo.PostData;
 
@@ -12,6 +13,11 @@ import java.util.List;
 
 @Dao
 public abstract class PostDao {
+
+    @Transaction
+    public void deleteAllPostTransaction() {
+        deleteAllPosts();
+    }
 
     @Query("SELECT * FROM posts_table")
     public abstract LiveData<List<PostData>> getAllPosts();

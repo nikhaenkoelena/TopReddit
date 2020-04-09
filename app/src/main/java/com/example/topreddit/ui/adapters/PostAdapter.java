@@ -23,6 +23,8 @@ import butterknife.ButterKnife;
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
 
     private List<PostData> postDatas;
+    private OnImageClickListener onImageClickListener;
+    private OnPostClickListener onPostClickListener;
     private static final String HTTP_FORMAT = "http";
 
     public PostAdapter() {
@@ -32,6 +34,26 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     public void setPostDatas(List<PostData> postDatas) {
         this.postDatas = postDatas;
         notifyDataSetChanged();
+    }
+
+    public List<PostData> getPostDatas() {
+        return postDatas;
+    }
+
+    public interface OnImageClickListener {
+        void onImageClick(int position);
+    }
+
+    public void setOnImageClickListener(OnImageClickListener onImageClickListener) {
+        this.onImageClickListener = onImageClickListener;
+    }
+
+    public interface OnPostClickListener {
+        void onPostClick(int position);
+    }
+
+    public void setOnPostClickListener(OnPostClickListener onPostClickListener) {
+        this.onPostClickListener = onPostClickListener;
     }
 
     @NonNull
@@ -77,6 +99,22 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         public PostViewHolder(@NonNull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            imageViewThumbnail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (onImageClickListener != null) {
+                        onImageClickListener.onImageClick(getAdapterPosition());
+                    }
+                }
+            });
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (onPostClickListener!= null) {
+                        onPostClickListener.onPostClick(getAdapterPosition());
+                    }
+                }
+            });
         }
     }
 }
