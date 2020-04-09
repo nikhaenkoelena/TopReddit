@@ -12,9 +12,10 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import com.example.topreddit.ui.adapters.PostAdapter;
 import com.example.topreddit.viewmodels.MainViewModel;
 
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,6 +52,9 @@ public class MainFragment extends Fragment {
     private static final String JPEG_FORMAT = ".jpg";
     private static final String PNG_FORMAT = ".png";
     private static final String BUNDLE_KEY = "Url";
+    private static final int DISPLAY_WIDTH = 500;
+    private static final int COLUMN_COUNT_1 = 1;
+    private static final int COLUMN_COUNT_2 = 2;
 
     private static boolean isLoading;
 
@@ -59,8 +64,16 @@ public class MainFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         unbinder = ButterKnife.bind(this, view);
+        Objects.requireNonNull(getActivity()).setTitle(R.string.app_name);
         setRetainInstance(true);
         return view;
+    }
+
+    private int getColumnCount() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        Objects.requireNonNull(getActivity()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int width = (int) (displayMetrics.widthPixels / displayMetrics.density);
+        return width < DISPLAY_WIDTH ? COLUMN_COUNT_1 : COLUMN_COUNT_2;
     }
 
     @Override
@@ -69,7 +82,7 @@ public class MainFragment extends Fragment {
         navController = Navigation.findNavController(view);
         viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         adapter = new PostAdapter();
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), getColumnCount()));
         recyclerView.setAdapter(adapter);
         isLoading = false;
         setOnImageClickListener();

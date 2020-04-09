@@ -1,16 +1,27 @@
 package com.example.topreddit.repository;
 
+import android.Manifest;
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
+import com.example.topreddit.R;
 import com.example.topreddit.datasources.api.ApiFactory;
 import com.example.topreddit.datasources.api.ApiService;
 import com.example.topreddit.datasources.database.PostDatabase;
@@ -18,14 +29,20 @@ import com.example.topreddit.domain.pojo.Child;
 import com.example.topreddit.domain.pojo.Data;
 import com.example.topreddit.domain.pojo.PostData;
 import com.example.topreddit.domain.pojo.PostResult;
+import com.example.topreddit.ui.MainActivity;
+import com.example.topreddit.viewmodels.SaveImageViewModel;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
 import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -36,18 +53,21 @@ import io.reactivex.schedulers.Schedulers;
 
 public class Repository {
 
-    Context context;
-    CompositeDisposable compositeDisposable;
+    private Context context;
+    private CompositeDisposable compositeDisposable;
     private PostDatabase database;
     private LiveData<List<PostData>> posts;
+    public MutableLiveData<Throwable> errors;
 
     private static final String NULL_CHECK = "null";
+    private static final String TITLE = "VIEW_PICTURE";
 
     public Repository(Context context) {
         this.context = context;
         compositeDisposable = new CompositeDisposable();
         database = PostDatabase.getInstance(context);
         posts = database.postDao().getAllPosts();
+        errors = new MutableLiveData<>();
     }
 
     public void loadData(String after) {
@@ -82,7 +102,7 @@ public class Repository {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+                        errors.setValue(throwable);
                     }
                 });
         compositeDisposable.add(disposable);
@@ -117,19 +137,42 @@ public class Repository {
                 .subscribe();
     }
 
-    public void onSaveImageClick(String url, Context context) {
-        Uri uri = Uri.parse(url);
-        Bitmap bitmap = null;
+    public void onSaveImageClick(String url, final Activity activity, final SaveImageViewModel viewModel) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            Picasso.get().load(url).into(new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    savePicture(bitmap, viewModel);
+                }
+
+                @Override
+                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+            });
+        } else {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+
+        }
+    }
+
+
+    private void savePicture(Bitmap bitmap, final SaveImageViewModel viewModel) {
+        FileOutputStream outStream = null;
+        File path = Environment.getExternalStorageDirectory();
+        path.mkdirs();
+        File imageFile = new File(path.getAbsolutePath(), System.currentTimeMillis() + ".png");
         try {
-            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
-        } catch (
-                IOException e) {
+            imageFile.createNewFile();
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        FileOutputStream outStream = null;
-        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + "reddit");
-        path.mkdirs();
-        File imageFile = new File(path, System.currentTimeMillis() + ".png");
         try {
             outStream = new FileOutputStream(imageFile);
         } catch (
@@ -145,12 +188,11 @@ public class Repository {
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        MediaScannerConnection.scanFile(context, new String[]{imageFile.getAbsolutePath()}, null, new MediaScannerConnection.OnScanCompletedListener() {
-//            public void onScanCompleted(String path, Uri uri) {
-//                Log.i("ExternalStorage", "Scanned " + path + ":");
-//                Log.i("ExternalStorage", "-> uri=" + uri);
-//            }
-//        });
+        MediaScannerConnection.scanFile(context, new String[]{imageFile.getAbsolutePath()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+            public void onScanCompleted(String path, Uri uri) {
+                viewModel.passSavingResult();
+            }
+        });
     }
 
     private void updateAfter(final String afterDef) {

@@ -1,40 +1,25 @@
 package com.example.topreddit.ui.fragments;
 
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import android.os.Environment;
-import android.os.LocaleList;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.topreddit.R;
-import com.example.topreddit.viewmodels.MainViewModel;
 import com.example.topreddit.viewmodels.SaveImageViewModel;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Locale;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -53,6 +38,8 @@ public class SaveImageFragment extends Fragment {
     private SaveImageViewModel viewModel;
 
     private static final String BUNDLE_KEY = "Url";
+    private static final Integer RC_IMAGE_DOWNLOADED = 1;
+
     private String url;
 
     @Override
@@ -60,6 +47,7 @@ public class SaveImageFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_save_image, container, false);
         unbinder = ButterKnife.bind(this, view);
+        Objects.requireNonNull(getActivity()).setTitle(R.string.app_name);
         return view;
     }
 
@@ -75,15 +63,36 @@ public class SaveImageFragment extends Fragment {
             Picasso.get().load(R.drawable.redditicon).into(imageView);
             textViewSaveToGallery.setVisibility(View.GONE);
         }
+        getNotifications();
+    }
+
+    private void getNotifications() {
+        viewModel.getNotifications().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if (integer == RC_IMAGE_DOWNLOADED) {
+                    Log.i("CheckInt", Integer.toString(integer));
+                    Toast.makeText(getContext(), R.string.save_to_gallery, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void setOnSaveImageClickListener() {
         textViewSaveToGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewModel.onSaveImageClick(url);
+                viewModel.onSaveImageClick(url, getActivity());
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 0:
+                viewModel.onSaveImageClick(url, getActivity());
+        }
     }
 
     @Override
